@@ -11,7 +11,7 @@ class TestSoftmax(unittest.TestCase):
         np.random.seed(395)
         X = np.random.randn(3073, 10)
         y = np.random.uniform(0, 10, 3073).astype(np.int16)
-        expected_loss = 2.7536201727859835 
+        expected_loss = 2.7536201727859835
         loss, _ = classifiers.softmax(X, y)
         e = rel_error(loss, expected_loss)
         print("Relative error", e)

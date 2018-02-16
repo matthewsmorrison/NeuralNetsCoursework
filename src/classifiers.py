@@ -26,19 +26,20 @@ def softmax(logits, y):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
 
-    reg = 1
+    N = logits.shape[0]
 
-    number_train = logits.shape[0]
-    shift_logits = logits - np.max(logits, axis=1).reshape(-1,1)
-    softmax_output = np.exp(shift_logits) / np.sum(np.exp(shift_logits),axis=1).reshape(-1,1)
-    loss = -np.sum(np.log(softmax_output[range(number_train),list(y)]))
-    loss /= number_train
-    loss += 0.5 * reg * np.sum(logits * logits)
+    # Calculate softmax
+    stable_logits = logits - np.max(logits)
+    softmax = (np.exp(stable_logits)) / np.sum(np.exp(stable_logits),axis=1)[:,None]
 
-    dS = softmax_output.copy()
-    dS[range(number_train),list(y)] += -1
-    dlogits = (logits.T).dot(dS)
-    dlogits = dlogits/number_train + reg * logits
+    # Now calculate the loss
+    loss = -np.log(softmax[np.arange(len(softmax)), y]).sum()
+    loss /= N
+
+    # Now calculate the gradient
+    dlogits = np.copy(softmax)
+    dlogits[np.arange(N),y] -=1
+    dlogits /= N
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
