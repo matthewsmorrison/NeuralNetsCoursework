@@ -1,6 +1,21 @@
 import numpy as np
 
 
+n_X = 10
+X_shape = [4, 2, 5]
+n_out = 3
+n_input = n_X * np.prod(X_shape)
+print("n_input ",n_input)
+n_weights = np.prod(X_shape) * n_out
+print("n_weights ",n_weights)
+X = np.linspace(-0.2, 0.5, num=n_input).reshape([n_X] + X_shape)
+print("X ", X, X.shape[0], X.shape[1])
+W = np.linspace(-0.4, 0.2, num=n_weights).reshape(
+    np.prod(X_shape), n_out)
+print("W", W , W.shape[0], W.shape[1])
+b = np.linspace(0.5, 1, num=n_out)
+print("b ", b, b.shape[0])
+
 def linear_forward(X, W, b):
     """
     Computes the forward pass for a linear (fully-connected) layer.
