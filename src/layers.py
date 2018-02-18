@@ -136,7 +136,13 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-
+#    we only use the dropout mask if we are in training. Otherwise, mask = None.
+#    We add the scaling factor(1/p) as part of the inverted dropout.
+    if train==True:
+        mask = np.random.binomial(1,p,size=X.shape) * (1/(1-p))
+        out = X * mask
+    else:
+        out = X
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
@@ -167,7 +173,10 @@ def dropout_backward(dout, mask, p=0.5, train=True):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-
+    if train == True:
+        dX = dout * mask
+    else:
+        dX = dout
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
