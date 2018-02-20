@@ -5,15 +5,18 @@ def linear_forward(X, W, b):
     """
     Computes the forward pass for a linear (fully-connected) layer.
 
+    The input X has shape (N, d_1, ..., d_K) and contains N samples with each
+    example X[i] has shape (d_1, ..., d_K). Each input is reshaped to a
+    vector of dimension D = d_1 * ... * d_K and then transformed to an output
+    vector of dimension M.
+
     Args:
     - X: A numpy array of shape (N, d_1, ..., d_K) incoming data
-    - W: Anumpy array of shape (K, M) of weights
+    - W: A numpy array of shape (D, M) of weights, with D = d_1 * ... * d_K
     - b: A numpy array of shape (M, ) of biases
 
     Returns:
     - out: linear transformation to the incoming data
-
-
     """
     out = None
     """
@@ -23,28 +26,25 @@ def linear_forward(X, W, b):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-    a = X.shape[0]*-1
-    c = W.shape[0]
-    X = np.reshape(X,(a,c))
+    X = np.reshape(X,(-1,W.shape[0]))
     out = np.add(np.dot(X,W), b)
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
     return out
 
-
 def linear_backward(dout, X, W, b):
     """
-    Computes the forward pass for a linear (fully-connected) layer.
+    Computes the backward pass for a linear (fully-connected) layer.
 
     Args:
     - dout: Upstream derivative, of shape (N, M)
     - X: A numpy array of shape (N, d_1, ..., d_K) incoming data
-    - W: Anumpy array of shape (K, M) of weights
+    - W: A numpy array of shape (D, M) of weights, with D= d_1 * ... * d_K
     - b: A numpy array of shape (M, ) of biases
 
     Returns (as tuple):
-    - dX: A numpy array of shape (N, d1, ..., d_k), gradient with respect to x
+    - dX: A numpy array of shape (N, d_1, ..., d_K), gradient with respect to x
     - dW: A numpy array of shape (D, M), gradient with respect to W
     - db: A nump array of shape (M,), gradient with respect to b
     """
@@ -56,14 +56,21 @@ def linear_backward(dout, X, W, b):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-
-
+    out = linear_forward(X, W, b)
+    db = np.dot(dout,b)
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
 
     return dX, dW, db
 
+# np.random.seed(395)
+# x = np.random.randn(10, 2, 3)
+# w = np.random.randn(6, 5)
+# b = np.random.randn(5)
+# dout = np.random.randn(10, 5)
+#
+# dx, dw, db = linear_backward(dout, x, w, b)
 
 def relu_forward(X):
     """
@@ -82,6 +89,7 @@ def relu_forward(X):
     ###########################################################################
     out = X.copy()  # Must use copy in numpy to avoid pass by reference.
     out[out < 0] = 0
+    print(out)
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -138,8 +146,8 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-#    we only use the dropout mask if we are in training. Otherwise, mask = None.
-#    We add the scaling factor(1/p) as part of the inverted dropout.
+    #    we only use the dropout mask if we are in training. Otherwise, mask = None.
+    #    We add the scaling factor(1/p) as part of the inverted dropout.
     if train==True:
         mask = np.random.binomial(1,p,size=X.shape) * (1/(1-p))
         out = X * mask
