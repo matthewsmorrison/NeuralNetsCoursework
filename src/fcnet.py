@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.classifiers import softmax
-from src.layers import (linear_forward, linear_backward, relu_forward,
+from classifiers import softmax
+from layers import (linear_forward, linear_backward, relu_forward,
                         relu_backward, dropout_forward, dropout_backward)
 
 
@@ -20,7 +20,8 @@ def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-
+    W = dtype(np.random.normal(scale = weight_scale))
+    b = dtype(0)
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
@@ -70,6 +71,20 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
+        w = "W"
+        b = "b"
+
+        W,B = random_init(input_dim, hidden_dims[0])
+        self.params[w+"1"] = W
+        self.params[b+"1"] = B
+
+        for i in range(1,self.num_layers-1):
+            W,B = random_init(hidden_dims[i-1], hidden_dims[i])
+            self.params[w+str(i+1)] = W
+            self.params[b+str(i+1)] = B
+
+        # for i in self.params:
+        #     print(i, self.params[i])
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -145,3 +160,6 @@ class FullyConnectedNet(object):
         #                            END OF YOUR CODE                         #
         #######################################################################
         return loss, grads
+
+
+# model = FullyConnectedNet(hidden_dims = [5,3,2])

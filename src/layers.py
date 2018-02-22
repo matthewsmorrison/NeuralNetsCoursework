@@ -92,7 +92,6 @@ def relu_forward(X):
     ###########################################################################
     return out
 
-
 def relu_backward(dout, X):
     """
     Computes the backward pass for rectified linear unit (ReLU) layer.
@@ -115,7 +114,6 @@ def relu_backward(dout, X):
     #                            END OF YOUR CODE                             #
     ###########################################################################
     return dX
-
 
 def dropout_forward(X, p=0.5, train=True, seed=42):
     """
@@ -158,7 +156,6 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     #                            END OF YOUR CODE                             #
     ###########################################################################
     return out, mask
-
 
 def dropout_backward(dout, mask, p=0.5, train=True):
     """
