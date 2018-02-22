@@ -57,22 +57,17 @@ def linear_backward(dout, X, W, b):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
     dX = dout.dot(W.T).reshape(X.shape)
+    print(dX)
     dW = X.reshape(X.shape[0], -1).T.dot(dout)
+    print(dW)
     db = np.sum(dout, axis=0)
+    print(db)
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
 
     return dX, dW, db
-
-# np.random.seed(395)
-# x = np.random.randn(10, 2, 3)
-# w = np.random.randn(6, 5)
-# b = np.random.randn(5)
-# dout = np.random.randn(10, 5)
-#
-# dx, dw, db = linear_backward(dout, x, w, b)
 
 def relu_forward(X):
     """
@@ -137,6 +132,7 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     - mask: In training mode, mask is the dropout
       mask that was used to multiply the input; in test mode, mask is None.
     """
+    # print("entered dropout forward")
     out = None
     mask = None
     if seed:
@@ -151,7 +147,9 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     #    we only use the dropout mask if we are in training. Otherwise, mask = None.
     #    We add the scaling factor(1/p) as part of the inverted dropout.
     if train==True:
-        mask = np.random.binomial(1,p,size=X.shape) * (1/(1-p))
+        # print("entered true")
+        q=1-p
+        mask = np.random.binomial(1,p=q,size=X.shape) * (1/(q))
         out = X * mask
     else:
         out = X
