@@ -20,8 +20,8 @@ def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-    W = dtype(np.random.normal(scale = weight_scale))
-    b = dtype(0)
+    W = np.random.normal(scale = weight_scale,size=(n_in,n_out))
+    b = np.zeros(n_out,dtype)
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
@@ -73,18 +73,25 @@ class FullyConnectedNet(object):
 
         w = "W"
         b = "b"
-
-        W,B = random_init(input_dim, hidden_dims[0])
+#        for input to first hidden layer
+        W,B = random_init(input_dim, hidden_dims[0],weight_scale,dtype)
         self.params[w+"1"] = W
         self.params[b+"1"] = B
-
-        for i in range(1,self.num_layers-1):
-            W,B = random_init(hidden_dims[i-1], hidden_dims[i])
+#       for between the hidden layers
+        for i in range(1,self.num_layers):
+        
+            if i == self.num_layers-1:
+            #        for last hidden layer to output layer
+                W,B = random_init(hidden_dims[i-1], num_classes,weight_scale,dtype)
+            else:
+                W,B = random_init(hidden_dims[i-1], hidden_dims[i],weight_scale,dtype)
             self.params[w+str(i+1)] = W
             self.params[b+str(i+1)] = B
+        
 
-        # for i in self.params:
-        #     print(i, self.params[i])
+        
+#        for i in self.params:
+#            print(i, self.params[i])
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -133,6 +140,31 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
+        # Training time
+
+        # let's train the forward pass according to [linear - relu - (dropout)] x (N - 1) - linear - softmax
+        curr_act = X
+        activations = [X]
+
+        #for the hidden layers except the last one
+        for i in range(self.num_layers-1):
+            linear_act = linear_forward(curr_act, W=self.params["W"+str(i+1)],b=self.params["b"+str(i+1)])
+            curr_act = relu_forward(linear_act)
+#            print("curr_act: ",curr_act)
+            if self.use_dropout:
+                curr_act = dropout_forward(X,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])   
+            activations.append([curr_act])
+        
+        
+        # Then for the final hidden layer, which feeds the output classes
+        curr_act = linear_forward(curr_act, W=self.params["W"+str(self.num_layers)],b=self.params["b"+str(self.num_layers)])
+#        print("activations: ",activations)
+#        print("curr act size: ",curr_act.shape)
+#        print("curr act: ",curr_act)
+        loss,grads = softmax(curr_act,y)
+        print("grads size: ",grads.shape)
+        print("grads: ",grads)
+
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -162,4 +194,12 @@ class FullyConnectedNet(object):
         return loss, grads
 
 
-# model = FullyConnectedNet(hidden_dims = [5,3,2])
+#model = FullyConnectedNet(hidden_dims = [5,3,2],input_dim=15)
+N, D, H1, H2, C = 2, 15, 2, 3, 10
+X = np.random.randn(N, D)
+y = np.random.randint(C, size=(N,))
+
+model = FullyConnectedNet([H1, H2], input_dim=D, num_classes=C, dtype=np.float64)
+loss, grads = model.loss(X, y)
+#print("X: ", X.shape)
+
