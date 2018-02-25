@@ -162,9 +162,11 @@ class FullyConnectedNet(object):
 #        print("curr act size: ",curr_act.shape)
 #        print("curr act: ",curr_act)
         loss,grads = softmax(curr_act,y)
-        print("grads size: ",grads.shape)
-        print("grads: ",grads)
-
+#        print("grads size: ",grads.shape)
+#        print("grads: ",grads)
+        stable_logits = curr_act - np.max(curr_act)
+        scores = (np.exp(curr_act)) / np.sum(np.exp(curr_act),axis=1)[:,None]
+#        print("curr act after softmax: ",curr_act)
 
         #######################################################################
         #                            END OF YOUR CODE                         #
