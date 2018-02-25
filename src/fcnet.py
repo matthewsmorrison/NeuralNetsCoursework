@@ -148,25 +148,34 @@ class FullyConnectedNet(object):
 
         #for the hidden layers except the last one
         for i in range(self.num_layers-1):
-            linear_act = linear_forward(curr_act, W=self.params["W"+str(i+1)],b=self.params["b"+str(i+1)])
-            curr_act = relu_forward(linear_act)
+            linear_cache["L"+str(i+1)] = curr_act
+            curr_act = linear_forward(curr_act, W=self.params["W"+str(i+1)],b=self.params["b"+str(i+1)])
+            relu_cache["R"+str(i+1)] = curr_act
+            curr_act = relu_forward(curr_act)
 #            print("curr_act: ",curr_act)
             if self.use_dropout:
-                curr_act = dropout_forward(X,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])   
+                dropout_cache["D"+str(i+1)] = curr_act
+                curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
             activations.append([curr_act])
         
         
         # Then for the final hidden layer, which feeds the output classes
+        linear_cache["L"+str(self.num_layers)] = curr_act
         curr_act = linear_forward(curr_act, W=self.params["W"+str(self.num_layers)],b=self.params["b"+str(self.num_layers)])
+        if self.use_dropout:
+            dropout_cache["D"+str(self.num_layers)] = curr_act    
+            curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+        scores = curr_act       
 #        print("activations: ",activations)
 #        print("curr act size: ",curr_act.shape)
 #        print("curr act: ",curr_act)
-        loss,grads = softmax(curr_act,y)
+        
 #        print("grads size: ",grads.shape)
 #        print("grads: ",grads)
-        stable_logits = curr_act - np.max(curr_act)
-        scores = (np.exp(curr_act)) / np.sum(np.exp(curr_act),axis=1)[:,None]
-#        print("curr act after softmax: ",curr_act)
+#        stable_logits = curr_act - np.max(curr_act)
+#        scores = (np.exp(curr_act)) / np.sum(np.exp(curr_act),axis=1)[:,None]
+#        print("curr act after softmax: ",scores)
+#        print("loss: ",loss)
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -188,8 +197,33 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
-
-
+        loss,deltas = softmax(curr_act,y)
+        
+        for i in range(self.num_layers):
+#            add in the L2 regularisation terms for each of the layers
+            loss += 0.5 * self.reg * np.sum(self.params["W"+str(i+1)]) * np.sum(self.params["W"+str(i+1)])
+        
+        #backpropagate through the last layer
+        s = str(self.num_layers)
+        if self.use_dropout:
+                deltas = dropout_backward(deltas,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+        dX,dW,dB = linear_backward(dout=deltas,X=linear_cache["L"+s],W=self.params["W"+s],b=self.params["b"+s])
+        grads["W" + s] = dW + self.reg * self.params["W"+s]
+        grads["b" + s] = dB
+        
+#        now backpropagate through all the remaining layers
+        for i in range(self.num_layers-1,0,-1):
+            s = str(i)
+#            first through the dropout backwards
+            if self.use_dropout:
+               dX  = dropout_backward(dX,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+#        then through the relu backwards
+            dX = relu_backward(dX,relu_cache["R"+s])
+#       then through the linear transform backwards
+            dX,dW,dB = linear_backward(dout=dX,X=linear_cache["L"+s],W=self.params["W"+s],b=self.params["b"+s])
+            grads["W" + s] = dW + self.reg * self.params["W"+s]
+            grads["b" + s] = dB
+            
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
@@ -203,5 +237,6 @@ y = np.random.randint(C, size=(N,))
 
 model = FullyConnectedNet([H1, H2], input_dim=D, num_classes=C, dtype=np.float64)
 loss, grads = model.loss(X, y)
-#print("X: ", X.shape)
+print("loss: ",loss)
+print("grads: ",grads)
 
