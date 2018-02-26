@@ -79,7 +79,7 @@ class FullyConnectedNet(object):
         self.params[b+"1"] = B
 #       for between the hidden layers
         for i in range(1,self.num_layers):
-        
+
             if i == self.num_layers-1:
             #        for last hidden layer to output layer
                 W,B = random_init(hidden_dims[i-1], num_classes,weight_scale,dtype)
@@ -87,9 +87,9 @@ class FullyConnectedNet(object):
                 W,B = random_init(hidden_dims[i-1], hidden_dims[i],weight_scale,dtype)
             self.params[w+str(i+1)] = W
             self.params[b+str(i+1)] = B
-        
 
-        
+
+
 #        for i in self.params:
 #            print(i, self.params[i])
 
@@ -157,19 +157,19 @@ class FullyConnectedNet(object):
                 dropout_cache["D"+str(i+1)] = curr_act
                 curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
             activations.append([curr_act])
-        
-        
+
+
         # Then for the final hidden layer, which feeds the output classes
         linear_cache["L"+str(self.num_layers)] = curr_act
         curr_act = linear_forward(curr_act, W=self.params["W"+str(self.num_layers)],b=self.params["b"+str(self.num_layers)])
         if self.use_dropout:
-            dropout_cache["D"+str(self.num_layers)] = curr_act    
+            dropout_cache["D"+str(self.num_layers)] = curr_act
             curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
-        scores = curr_act       
+        scores = curr_act
 #        print("activations: ",activations)
 #        print("curr act size: ",curr_act.shape)
 #        print("curr act: ",curr_act)
-        
+
 #        print("grads size: ",grads.shape)
 #        print("grads: ",grads)
 #        stable_logits = curr_act - np.max(curr_act)
@@ -198,11 +198,11 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
         loss,deltas = softmax(curr_act,y)
-        
+
         for i in range(self.num_layers):
 #            add in the L2 regularisation terms for each of the layers
             loss += 0.5 * self.reg * np.sum(self.params["W"+str(i+1)]) * np.sum(self.params["W"+str(i+1)])
-        
+
         #backpropagate through the last layer
         s = str(self.num_layers)
         if self.use_dropout:
@@ -210,7 +210,7 @@ class FullyConnectedNet(object):
         dX,dW,dB = linear_backward(dout=deltas,X=linear_cache["L"+s],W=self.params["W"+s],b=self.params["b"+s])
         grads["W" + s] = dW + self.reg * self.params["W"+s]
         grads["b" + s] = dB
-        
+
 #        now backpropagate through all the remaining layers
         for i in range(self.num_layers-1,0,-1):
             s = str(i)
@@ -223,7 +223,7 @@ class FullyConnectedNet(object):
             dX,dW,dB = linear_backward(dout=dX,X=linear_cache["L"+s],W=self.params["W"+s],b=self.params["b"+s])
             grads["W" + s] = dW + self.reg * self.params["W"+s]
             grads["b" + s] = dB
-            
+
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
@@ -231,12 +231,11 @@ class FullyConnectedNet(object):
 
 
 #model = FullyConnectedNet(hidden_dims = [5,3,2],input_dim=15)
-N, D, H1, H2, C = 2, 15, 2, 3, 10
-X = np.random.randn(N, D)
-y = np.random.randint(C, size=(N,))
-
-model = FullyConnectedNet([H1, H2], input_dim=D, num_classes=C, dtype=np.float64)
-loss, grads = model.loss(X, y)
-print("loss: ",loss)
-print("grads: ",grads)
-
+# N, D, H1, H2, C = 2, 15, 2, 3, 10
+# X = np.random.randn(N, D)
+# y = np.random.randint(C, size=(N,))
+#
+# model = FullyConnectedNet([H1, H2], input_dim=D, num_classes=C, dtype=np.float64)
+# loss, grads = model.loss(X, y)
+# print("loss: ",loss)
+# print("grads: ",grads)
