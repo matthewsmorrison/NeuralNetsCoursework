@@ -4,6 +4,9 @@ import numpy as np
 import os
 import scipy.misc
 import platform
+import PIL as pillow
+from PIL import Image
+
 
 def load_pickle(f):
     version = platform.python_version_tuple()
@@ -79,3 +82,77 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
       'X_val': X_val, 'y_val': y_val,
       'X_test': X_test, 'y_test': y_test,
     }
+    
+def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
+    
+    if(num_val < 4000):
+        print("num_val size too small, please insert something bigger")
+    
+    if(num_val > num_training*0.2):
+        print("num_val size too large, please insert something smaller")
+    
+    directory = 'datasets/public'
+    train_dir = directory + '/Train/'
+    test_dir = directory + '/Test/'
+    
+    labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
+    
+    print(labels)
+    
+#    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
+    
+    X_train=y_train=X_val=y_val=X_test=y_test = []
+    
+
+    
+    for i in range(1,num_training+1):
+        with Image.open(train_dir + str(i) + '.jpg').convert("L") as image:
+#            print(image.shape)
+            im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+            im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
+#            print(im_arr)
+            X_train.append(im_arr)
+            y_train.append(labels[i])
+    
+    for i in range(1,num_test+1):
+        with Image.open(test_dir + str(i+28709) + '.jpg').convert("L") as image:
+            im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+            im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
+            X_test = np.append(X_test, im_arr)
+            y_test = np.append(y_test, labels[i+28708])
+            
+    
+            
+    # Subsample the data
+    mask = list(range(num_training, num_training + num_val))
+#    print("mask length ", len(mask))
+    X_val = X_train[mask[0]:mask[-1]]
+#    print("x_val ", X_val)
+    y_val = y_train[mask[0]:mask[-1]]
+    
+    mask = list(range(num_training))
+    X_train = X_train[mask[0]:mask[-1]]
+    y_train = y_train[mask[0]:mask[-1]]
+    
+    out = {
+      'X_train': X_train, 'y_train': y_train,
+      'X_val': X_val, 'y_val': y_val,
+      'X_test': X_test, 'y_test': y_test,
+    }
+    
+#    print(out)
+    
+    # Package data into a dictionary
+    return out
+    
+    
+image_dict = get_FER2013_data()  
+f = open('Datasets/public/image_dict.txt','wb')
+pickle.dump(image_dict,f)
+f.close()
+
+
+
+    
+    
+    
