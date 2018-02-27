@@ -14,7 +14,7 @@ data_dict = get_CIFAR10_data(num_training=50)
 
 model = FullyConnectedNet([100],reg=0, dtype=np.float64)
 
-solver = Solver(model,data_dict,optim_config={'learning_rate':1e-3},num_epochs=20,batch_size=50,print_every=50)
+solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},num_epochs=20,batch_size=50,print_every=50)
 solver.train()
 
 plt.subplot(2,1,1)

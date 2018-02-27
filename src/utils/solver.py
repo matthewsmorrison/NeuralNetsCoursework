@@ -7,6 +7,7 @@ import os
 import pickle as pickle
 
 import numpy as np
+import pandas as pd
 
 import src.utils.optim as optim
 
@@ -47,7 +48,7 @@ class Solver(object):
     }
     model = MyAwesomeModel(hidden_size=100, reg=10)
     solver = Solver(model, data,
-                    update_rule='sgd',
+                    update_rule='sgd_momentum',
                     optim_config={
                       'learning_rate': 1e-3,
                     },
@@ -125,7 +126,7 @@ class Solver(object):
         self.y_val = data['y_val']
 
         # Unpack keyword arguments
-        self.update_rule = kwargs.pop('update_rule', 'sgd')
+        self.update_rule = kwargs.pop('update_rule', 'sgd_momentum')
         self.optim_config = kwargs.pop('optim_config', {})
         self.lr_decay = kwargs.pop('lr_decay', 1.0)
         self.batch_size = kwargs.pop('batch_size', 100)
@@ -255,8 +256,12 @@ class Solver(object):
         y_pred = np.hstack(y_pred)
         acc = np.mean(y_pred == y)
 
-        return acc
+        if (self.epoch == self.num_epochs):
+            conf_matrix = confusion_matrix(y_pred,y)
+            print(conf_matrix)
+            results = performanceMetrics(conf_matrix)
 
+        return acc
 
     def train(self):
         """
@@ -307,4 +312,58 @@ class Solver(object):
                         self.best_params[k] = v.copy()
 
         # At the end of training swap the best params into the model
+
         self.model.params = self.best_params
+
+def confusion_matrix(predicted,actual):
+
+    conf_matrix = pd.DataFrame(np.zeros((10,10),int))
+    data_num = actual.shape[0]
+
+    for i in range(0,data_num):
+        conf_matrix[actual[i]][predicted[i]] += 1
+
+    return conf_matrix
+
+# Produce performance metrixs from confusion matrix
+def performanceMetrics(confMatrix):
+    # Here is where the classification measures are calculated
+    # Number one: total classification rate.
+    total_predictions = confMatrix.values.sum()
+    total_sum = 0
+    for row in range(0,6):
+        total_sum = total_sum + confMatrix.iloc[row].loc[row]
+
+    accuracy = (total_sum/total_predictions)*100
+    print("Total Predictions:",total_predictions)
+    print("Total Correct Predictions:",total_sum)
+    print("Classification Rate / Accuracy:", "{0:.0f}%".format(accuracy,"\n"))
+
+    # Number two: class specific classification measures
+    unweighted_average_recall = 0
+    precisions = []
+    recalls = []
+    F1s = []
+    for class_number in range(0,6):
+        print("Classification measures for class",class_number,":")
+        number_correct = confMatrix.iloc[class_number].loc[class_number]
+        total_number_of_class = confMatrix.iloc[class_number].sum()
+        total_number_labelled = confMatrix[class_number].sum()
+
+        precision = number_correct / total_number_labelled
+        precisions.append(precision)
+        recall = number_correct / total_number_of_class
+        recalls.append(recall)
+        F1 = 2*((precision*recall)/(precision+recall))
+        F1s.append(F1)
+        unweighted_average_recall = unweighted_average_recall + recall
+
+        print("Precision:","{0:.0f}%".format(precision*100))
+        print("Recall:","{0:.0f}%".format(recall*100))
+        print("F1:","{0:.0f}%".format(F1*100),"\n")
+
+    unweighted_average_recall = unweighted_average_recall / 6
+    print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")
+    results = {"accuracy":accuracy, "precision":precisions, "recall":recalls,
+     "F1":F1s, "uneweighted_average_recall":unweighted_average_recall}
+    return results

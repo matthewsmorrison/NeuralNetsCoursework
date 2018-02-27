@@ -57,6 +57,7 @@ def sgd_momentum(w, dw, config=None):
     """
     if config is None: config = {}
     config.setdefault('learning_rate', 1e-2)
+
     config.setdefault('momentum', 0.9)
     v = config.get('velocity', np.zeros_like(w))
 
@@ -65,7 +66,11 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    
+
+    step_size = config['learning_rate'] * dw + config['momentum'] * v
+    next_w = w - step_size
+    v = step_size
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
