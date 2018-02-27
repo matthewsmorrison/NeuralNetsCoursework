@@ -16,7 +16,7 @@ data_dict = get_CIFAR10_data()
 
 model = FullyConnectedNet([120],reg=0.5, dtype=np.float64)
 number_epochs = 15
-solver = Solver(model,data_dict,optim_config={'learning_rate':1e-3},lr_decay = 1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
+solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay = 1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
 solver.train()
 
 plt.subplot(2,1,1)
