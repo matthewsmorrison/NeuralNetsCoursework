@@ -28,74 +28,43 @@ def main(unused_argv):
 #    directory = 'datasets/public'
 #    train_dir = directory + '/Train/'
 #    test_dir = directory + '/Test/'
-    
-    
-#train_sz = 5000
-#test_sz = 2000
-#
-#    
-#train_image_batch = tf.placeholder(dtype=tf.float64, shape = [None,48*48])
-#train_labels_batch = tf.placeholder(dtype=tf.float64, shape = [None,])
-#test_image_batch = tf.placeholder(dtype=tf.float64, shape = [None,48*48])
-#test_labels_batch =  tf.placeholder(dtype=tf.float64, shape = [None,])
-#
-#with tf.Session() as sesh:
-#    tf.initalize_all_variables().run()
-#    coord = tf.train.Coordinator()
-#    threads = tf.train.start_queue_runners(coord=coord)
-#    image_tensor = sesh.run([image])
+
     
     
 ################################################################################
     
-    #bring in the FER2013 data
-    #input_dict = pickle.load(open("datasets/public/image_dict_short.pkl", "rb"))
-    data = get_FER2013_data() 
-#    training_data = data["X_train"]
-#    train_data = tf.contrib.learn.datasets.load_dataset(training_data)
-#    train_labels = np.asarray(data["y_train"],dtype=np.int32)
-#    test_data = np.asarray(data["X_test"]).test.images
-#    test_labels = np.asarray(data["y_test"],dtype=np.int32)  
-#    train_tensor, test_tensor, y_train, y_test =   get_FER2013_data_tensor(num_training = 5000,num_test = 1000) 
-    
-#    for key, value in data.items() :
-#        print(key)
-#    print(train_data)
+
 #    Create the estimator
-    classifier = tf.estimator.Estimator(model_fn = cnn_model,model_dir = "tmp/model")
+    classifier = tf.estimator.Estimator(model_fn = cnn_model,model_dir = "model_checkpoints")
 #    
-##    log the predictions
-    log_tensors = {"probabilities": "softmax_tensor"}
-    logging_hook = tf.train.LoggingTensorHook(tensors = log_tensors, every_n_iter = 128)
+
 #    
 ##    Train the model
-#    
+#   Retrieve the data
     
-#    a = tf.constant([1.0,2.0,3.0,4.0,5.0,6.0], shape=[2,3],name='a')
-#    b = tf.constant([1.0,2.0,3.0,4.0,5.0,6.0], shape=[3,2],name='b')
-#    c=tf.matmul(a,b)
-#    sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-#    print(sess.run(c))
-    
-    
-    
+    data = get_FER2013_data() 
+
+#   produce the input data stream    
     training_input = tf.estimator.inputs.numpy_input_fn(
             x={"x":data['X_train']},
             y = data['y_train'],
             batch_size = 128,
-            num_epochs = 3,
+            num_epochs = 200,
             shuffle = True)
+# Set up logging for predictions
+    tensors_to_log = {"probabilities": "softmax_tensor"}
+    logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50)
     
+#    Training phase
     classifier.train(
             input_fn = training_input,
-            max_steps = 100,
             hooks = [logging_hook]      
             )
     
 ##    Model evaluation
     evaluation_fn = tf.estimator.inputs.numpy_input_fn(
-            x={"x":data['X_test']},
-            y = data['y_test'],
+            x={"x":data['X_val']},
+            y = data['y_val'],
             num_epochs = 1,
             shuffle = False          
             )
