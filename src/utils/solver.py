@@ -270,6 +270,9 @@ class Solver(object):
         num_train = self.X_train.shape[0]
         iterations_per_epoch = max(num_train // self.batch_size, 1)
         num_iterations = self.num_epochs * iterations_per_epoch
+        # Number of times that error does not improve to stop the training
+        n_consecutive_times = 2
+        stopping_flag = 0
 
         for t in range(num_iterations):
             self._step()
@@ -311,6 +314,21 @@ class Solver(object):
                     for k, v in self.model.params.items():
                         self.best_params[k] = v.copy()
 
+                # Define early stopping criteria
+                # When the error on the validation set does not improve for
+                # n consecutive times
+                if (self.epoch > 1) and (val_acc <= previous_val_acc):
+                    print("Got here")
+                    stopping_flag += 1
+
+                if (self.epoch > 1) and (val_acc > previous_val_acc):
+                    stopping_flag = 0
+
+            if stopping_flag == 2:
+                break
+
+            previous_val_acc = val_acc
+
         # At the end of training swap the best params into the model
 
         self.model.params = self.best_params
@@ -331,21 +349,21 @@ def performanceMetrics(confMatrix):
     # Number one: total classification rate.
     total_predictions = confMatrix.values.sum()
     total_sum = 0
-    for row in range(0,6):
+    for row in range(0,10):
         total_sum = total_sum + confMatrix.iloc[row].loc[row]
 
     accuracy = (total_sum/total_predictions)*100
-    print("Total Predictions:",total_predictions)
-    print("Total Correct Predictions:",total_sum)
-    print("Classification Rate / Accuracy:", "{0:.0f}%".format(accuracy,"\n"))
+    # print("Total Predictions:",total_predictions)
+    # print("Total Correct Predictions:",total_sum)
+    # print("Classification Rate / Accuracy:", "{0:.0f}%".format(accuracy,"\n"))
 
     # Number two: class specific classification measures
     unweighted_average_recall = 0
     precisions = []
     recalls = []
     F1s = []
-    for class_number in range(0,6):
-        print("Classification measures for class",class_number,":")
+    for class_number in range(0,10):
+        # print("Classification measures for class",class_number,":")
         number_correct = confMatrix.iloc[class_number].loc[class_number]
         total_number_of_class = confMatrix.iloc[class_number].sum()
         total_number_labelled = confMatrix[class_number].sum()
@@ -358,12 +376,12 @@ def performanceMetrics(confMatrix):
         F1s.append(F1)
         unweighted_average_recall = unweighted_average_recall + recall
 
-        print("Precision:","{0:.0f}%".format(precision*100))
-        print("Recall:","{0:.0f}%".format(recall*100))
-        print("F1:","{0:.0f}%".format(F1*100),"\n")
+        # print("Precision:","{0:.0f}%".format(precision*100))
+        # print("Recall:","{0:.0f}%".format(recall*100))
+        # print("F1:","{0:.0f}%".format(F1*100),"\n")
 
-    unweighted_average_recall = unweighted_average_recall / 6
-    print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")
+    unweighted_average_recall = unweighted_average_recall / 10
+    # print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")
     results = {"accuracy":accuracy, "precision":precisions, "recall":recalls,
      "F1":F1s, "uneweighted_average_recall":unweighted_average_recall}
     return results
