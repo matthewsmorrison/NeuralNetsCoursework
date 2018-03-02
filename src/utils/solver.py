@@ -128,7 +128,7 @@ class Solver(object):
         # Unpack keyword arguments
         self.update_rule = kwargs.pop('update_rule', 'sgd_momentum')
         self.optim_config = kwargs.pop('optim_config', {})
-        self.lr_decay = kwargs.pop('lr_decay', 1.0)
+        self.lr_decay = kwargs.pop('lr_decay', 0.95)
         self.batch_size = kwargs.pop('batch_size', 100)
         self.num_epochs = kwargs.pop('num_epochs', 10)
         self.num_train_samples = kwargs.pop('num_train_samples', 1000)
@@ -273,6 +273,7 @@ class Solver(object):
         # Number of times that error does not improve to stop the training
         n_consecutive_times = 2
         stopping_flag = 0
+        epoch_learning_decay = 5
 
         for t in range(num_iterations):
             self._step()
@@ -288,7 +289,13 @@ class Solver(object):
             if epoch_end:
                 self.epoch += 1
                 for k in self.optim_configs:
-                    self.optim_configs[k]['learning_rate'] *= self.lr_decay
+                    learning_decay_flag = 0
+                    if (self.epoch % epoch_learning_decay)  == 0:
+                        learning_decay_flag = 1
+                    if learning_decay_flag:
+                        self.optim_configs[k]['learning_rate'] *= self.lr_decay
+                    else:
+                        self.optim_configs[k]['learning_rate'] *= 1
 
             # Check train and val accuracy on the first iteration, the last
             # iteration, and at the end of each epoch.
@@ -318,7 +325,6 @@ class Solver(object):
                 # When the error on the validation set does not improve for
                 # n consecutive times
                 if (self.epoch > 1) and (val_acc <= previous_val_acc):
-                    print("Got here")
                     stopping_flag += 1
 
                 if (self.epoch > 1) and (val_acc > previous_val_acc):
