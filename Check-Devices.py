@@ -14,3 +14,4 @@ def get_available_gpus():
 
 from tensorflow.python.client import device_lib
 print (device_lib.list_local_devices())
+print("GPUs: ",get_available_gpus())

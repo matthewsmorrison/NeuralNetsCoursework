@@ -9,7 +9,7 @@ import pickle as pickle
 import numpy as np
 import pandas as pd
 
-import src.utils.optim as optim
+import utils.optim as optim
 
 """
 @CS231 (cs231n.stanford.edu/)
