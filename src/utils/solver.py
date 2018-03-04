@@ -260,8 +260,10 @@ class Solver(object):
             conf_matrix = confusion_matrix(y_pred,y)
             print(conf_matrix)
             results = performanceMetrics(conf_matrix)
+        else:
+            results = []
 
-        return acc
+        return acc, results
 
     def train(self):
         """
@@ -303,8 +305,8 @@ class Solver(object):
             last_it = (t == num_iterations - 1)
             if first_it or last_it or epoch_end:
                 train_acc = self.check_accuracy(self.X_train, self.y_train,
-                    num_samples=self.num_train_samples)
-                val_acc = self.check_accuracy(self.X_val, self.y_val,
+                    num_samples=self.num_train_samples)[0]
+                val_acc, val_results = self.check_accuracy(self.X_val, self.y_val,
                     num_samples=self.num_val_samples)
                 self.train_acc_history.append(train_acc)
                 self.val_acc_history.append(val_acc)
@@ -330,14 +332,15 @@ class Solver(object):
                 if (self.epoch > 1) and (val_acc > previous_val_acc):
                     stopping_flag = 0
 
-            if stopping_flag == 2:
-                break
+            #if stopping_flag == 2:
+            #    break
 
             previous_val_acc = val_acc
 
         # At the end of training swap the best params into the model
 
         self.model.params = self.best_params
+        return val_results
 
 def confusion_matrix(predicted,actual):
 
@@ -382,9 +385,9 @@ def performanceMetrics(confMatrix):
         F1s.append(F1)
         unweighted_average_recall = unweighted_average_recall + recall
 
-        # print("Precision:","{0:.0f}%".format(precision*100))
-        # print("Recall:","{0:.0f}%".format(recall*100))
-        # print("F1:","{0:.0f}%".format(F1*100),"\n")
+        print("Precision:","{0:.0f}%".format(precision*100))
+        print("Recall:","{0:.0f}%".format(recall*100))
+        print("F1:","{0:.0f}%".format(F1*100),"\n")
 
     unweighted_average_recall = unweighted_average_recall / 10
     # print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")

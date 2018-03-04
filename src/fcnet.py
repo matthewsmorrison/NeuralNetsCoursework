@@ -102,7 +102,7 @@ class FullyConnectedNet(object):
         # each dropout layer.
         self.dropout_params = dict()
         if self.use_dropout:
-            self.dropout_params = {"train": True, "p": dropout}
+            self.dropout_params = {"Train": True, "p": dropout}
             if seed is not None:
                 self.dropout_params["seed"] = seed
         # Cast all parameters to the correct datatype
@@ -145,6 +145,8 @@ class FullyConnectedNet(object):
         # let's train the forward pass according to [linear - relu - (dropout)] x (N - 1) - linear - softmax
         curr_act = X
         activations = [X]
+        mask_cache = dict()
+        
 
         #for the hidden layers except the last one
         for i in range(self.num_layers-1):
@@ -155,17 +157,21 @@ class FullyConnectedNet(object):
 #            print("curr_act: ",curr_act)
             if self.use_dropout:
                 dropout_cache["D"+str(i+1)] = curr_act
-                curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+                curr_act, mask = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+                mask_cache["R"+str(i+1)] = mask
             activations.append([curr_act])
 
 
         # Then for the final hidden layer, which feeds the output classes
         linear_cache["L"+str(self.num_layers)] = curr_act
         curr_act = linear_forward(curr_act, W=self.params["W"+str(self.num_layers)],b=self.params["b"+str(self.num_layers)])
-        if self.use_dropout:
-            dropout_cache["D"+str(self.num_layers)] = curr_act
-            curr_act = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+        #print(curr_act)
+        #if self.use_dropout:
+        #    dropout_cache["D"+str(self.num_layers)] = curr_act
+        #    curr_act, mask = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+        #    mask_cache["R"+str(self.num_layers)] = mask
         scores = curr_act
+        #print(curr_act)
 #        print("activations: ",activations)
 #        print("curr act size: ",curr_act.shape)
 #        print("curr act: ",curr_act)
@@ -205,8 +211,8 @@ class FullyConnectedNet(object):
 
         #backpropagate through the last layer
         s = str(self.num_layers)
-        if self.use_dropout:
-                deltas = dropout_backward(deltas,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+        #if self.use_dropout:
+        #        deltas = dropout_backward(deltas,p=self.dropout_params["p"],train=self.dropout_params["Train"], mask = mask_cache["R"+s])
         dX,dW,dB = linear_backward(dout=deltas,X=linear_cache["L"+s],W=self.params["W"+s],b=self.params["b"+s])
         grads["W" + s] = dW + self.reg * self.params["W"+s]
         grads["b" + s] = dB
@@ -216,7 +222,7 @@ class FullyConnectedNet(object):
             s = str(i)
 #            first through the dropout backwards
             if self.use_dropout:
-               dX  = dropout_backward(dX,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+               dX  = dropout_backward(dX,p=self.dropout_params["p"],train=self.dropout_params["Train"], mask = mask_cache["R"+s])
 #        then through the relu backwards
             dX = relu_backward(dX,relu_cache["R"+s])
 #       then through the linear transform backwards
