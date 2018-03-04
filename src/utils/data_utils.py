@@ -112,12 +112,14 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
             im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
             im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
 
-            if(i < (num_training - num_val)):
-                X_train[i] = im_arr
-                y_train[i] = labels[i]
+            if(i < (num_val)):
+                X_val[i] = im_arr
+                y_val[i] = labels[i]
             else:
-                X_val[i-num_training] = im_arr
-                y_val[i-num_training] = labels[i]
+                X_train[i-num_val] = im_arr
+                y_train[i-num_val] = labels[i]
+
+
 
 #    print(X_train)
     for i in range(0,num_test):

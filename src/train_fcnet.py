@@ -1,8 +1,8 @@
 import numpy as np
 
-from src.fcnet import FullyConnectedNet
-from src.utils.solver import Solver
-from src.utils.data_utils import get_CIFAR10_data
+from fcnet import FullyConnectedNet
+from utils.solver import Solver
+from utils.data_utils import get_CIFAR10_data
 import matplotlib.pyplot as plt
 
 """
