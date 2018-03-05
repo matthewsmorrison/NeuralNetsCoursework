@@ -8,7 +8,7 @@ from src.utils.data_utils import get_CIFAR10_data
 from src.utils.data_utils import get_FER2013_data
 
 
-learningRates = [0.001, 1e-4, 1e-5, 1e-6, 1e-8]
+learningRates = [0.001]#, 1e-4, 1e-5, 1e-6, 1e-8]
 data_dict = get_FER2013_data()
 
 losses = []
@@ -18,14 +18,14 @@ classAccs = []
 
 for learningRate in learningRates:
     # print(learningRate)
-    model = FullyConnectedNet([120], dropout=0, reg=0, dtype=np.float64, seed=237)
-    number_epochs = 3
+    model = FullyConnectedNet([120],input_dim = 48*48*1, dropout=0, reg=0, dtype=np.float64, seed=237)
+    number_epochs = 10
     solver = Solver(model,data_dict,optim_config={'learning_rate':learningRate},lr_decay=1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
     accuracies.append(solver.val_acc_history)
     f1s.append(results["F1"])
-    classAccs.append(results["recall"])
+    classAccs.append(results["precision"])
 #print(losses, accuracies)
 
 fontP = FontProperties()
