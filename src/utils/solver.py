@@ -9,7 +9,7 @@ import pickle as pickle
 import numpy as np
 import pandas as pd
 
-import src.utils.optim as optim
+import utils.optim as optim
 
 """
 @CS231 (cs231n.stanford.edu/)
@@ -258,7 +258,7 @@ class Solver(object):
 
         if (self.epoch == self.num_epochs):
             conf_matrix = confusion_matrix(y_pred,y)
-            print(conf_matrix)
+            # print(conf_matrix)
             results = performanceMetrics(conf_matrix)
         else:
             results = []
@@ -385,9 +385,9 @@ def performanceMetrics(confMatrix):
         F1s.append(F1)
         unweighted_average_recall = unweighted_average_recall + recall
 
-        #print("Precision:","{0:.0f}%".format(precision*100))
-        #print("Recall:","{0:.0f}%".format(recall*100))
-        #print("F1:","{0:.0f}%".format(F1*100),"\n")
+        # print("Precision:","{0:.0f}%".format(precision*100))
+        # print("Recall:","{0:.0f}%".format(recall*100))
+        # print("F1:","{0:.0f}%".format(F1*100),"\n")
 
     unweighted_average_recall = unweighted_average_recall / 10
     # print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")
