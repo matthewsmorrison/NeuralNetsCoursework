@@ -1,7 +1,7 @@
 import numpy as np
 
-from classifiers import softmax
-from layers import (linear_forward, linear_backward, relu_forward,
+from src.classifiers import softmax
+from src.layers import (linear_forward, linear_backward, relu_forward,
                         relu_backward, dropout_forward, dropout_backward)
 
 
@@ -146,8 +146,9 @@ class FullyConnectedNet(object):
         curr_act = X
         activations = [X]
         mask_cache = dict()
-        
-        print(curr_act.shape)
+
+        epsilon = 0.00000000001
+
         #for the hidden layers except the last one
         for i in range(self.num_layers-1):
             linear_cache["L"+str(i+1)] = curr_act
@@ -173,7 +174,7 @@ class FullyConnectedNet(object):
         #    dropout_cache["D"+str(self.num_layers)] = curr_act
         #    curr_act, mask = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
         #    mask_cache["R"+str(self.num_layers)] = mask
-        scores = curr_act
+        scores = curr_act+epsilon
         #print(curr_act)
 #        print("activations: ",activations)
 #        print("curr act size: ",curr_act.shape)
@@ -206,7 +207,6 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
-        print(X.shape, curr_act.shape, y.shape)
         loss,deltas = softmax(curr_act,y)
 
         for i in range(self.num_layers):

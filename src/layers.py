@@ -26,11 +26,17 @@ def linear_forward(X, W, b):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
+    # reshape x
+    # print("X before",X.shape)
+    # print("W before",W.shape)
+    # X = np.reshape(X,(X.shape[0],-1))
+    # print("X after",X.shape)
+    #
+    # out = np.dot(X,W) + b
+    # print("Out after",out.shape)
 
-    X = np.reshape(X,(-1,W.shape[0]))
+    out = X.reshape(X.shape[0], -1).dot(W) + b
 
-    out = np.add(np.dot(X,W), b)
-    
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -59,17 +65,10 @@ def linear_backward(dout, X, W, b):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-#    print("linear backwards incoming: ")
-#    print ("X shape: ",X.shape)
-#    print("W shape: ",W.shape)
-#    print("dout shape: ",dout.shape)
-    
+
     dX = dout.dot(W.T).reshape(X.shape)
-#    print(dX)
     dW = X.reshape(X.shape[0], -1).T.dot(dout)
-#    print(dW)
     db = np.sum(dout, axis=0)
-#     print(db)
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
@@ -92,11 +91,9 @@ def relu_forward(X):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-#    print("relu called: input ",X)
     out = X.copy()  # Must use copy in numpy to avoid pass by reference.
     out[out < 0] = 0
     out = np.maximum(0, X)
-#    print("relu called: output ",X)
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -119,7 +116,6 @@ def relu_backward(dout, X):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
     dX = (X > 0) * dout
-
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################

@@ -6,7 +6,7 @@ import scipy.misc
 import platform
 import PIL as pillow
 from PIL import Image
-import tensorflow as tf
+# import tensorflow as tf
 
 # import tensorflow as tf
 

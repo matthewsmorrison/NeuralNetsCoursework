@@ -33,6 +33,9 @@ def softmax(logits, y):
     softmax = (np.exp(stable_logits)) / np.sum(np.exp(stable_logits),axis=1)[:,None]
     
     # Now calculate the loss
+    print(np.arange(len(softmax)).shape)
+    print(y.shape)
+
     loss = -np.log(softmax[np.arange(len(softmax)), y]).sum()
     loss /= N
 
