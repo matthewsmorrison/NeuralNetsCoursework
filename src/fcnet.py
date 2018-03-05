@@ -147,13 +147,15 @@ class FullyConnectedNet(object):
         activations = [X]
         mask_cache = dict()
         
-
+        print(curr_act.shape)
         #for the hidden layers except the last one
         for i in range(self.num_layers-1):
             linear_cache["L"+str(i+1)] = curr_act
             curr_act = linear_forward(curr_act, W=self.params["W"+str(i+1)],b=self.params["b"+str(i+1)])
+            print(i, curr_act.shape)
             relu_cache["R"+str(i+1)] = curr_act
             curr_act = relu_forward(curr_act)
+            print(curr_act.shape)
 #            print("curr_act: ",curr_act)
             if self.use_dropout:
                 dropout_cache["D"+str(i+1)] = curr_act
@@ -165,6 +167,7 @@ class FullyConnectedNet(object):
         # Then for the final hidden layer, which feeds the output classes
         linear_cache["L"+str(self.num_layers)] = curr_act
         curr_act = linear_forward(curr_act, W=self.params["W"+str(self.num_layers)],b=self.params["b"+str(self.num_layers)])
+        print(curr_act.shape)
         #print(curr_act)
         #if self.use_dropout:
         #    dropout_cache["D"+str(self.num_layers)] = curr_act
@@ -203,6 +206,7 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
+        print(X.shape, curr_act.shape, y.shape)
         loss,deltas = softmax(curr_act,y)
 
         for i in range(self.num_layers):
