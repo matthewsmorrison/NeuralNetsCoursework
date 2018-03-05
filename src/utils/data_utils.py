@@ -96,16 +96,23 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
 
     labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
 
-#    print(labels)
 
 #    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
 
-    X_train=np.empty((num_training,48,48,1))
-    y_train = np.empty((num_training,1))
-    X_test=np.empty((num_test,48,48,1))
-    y_test = np.empty((num_test,1))
-    X_val=np.empty((num_val,48,48,1))
-    y_val = np.empty((num_val,1))
+    X_train=[]
+    y_train = []
+    X_test=[]
+    y_test = []
+    X_val=[]
+    y_val = []
+
+    # X_train=np.empty((num_training,48,48,1))
+    # y_train = np.empty((num_training,1))
+    # X_test=np.empty((num_test,48,48,1))
+    # y_test = np.empty((num_test,1))
+    # X_val=np.empty((num_val,48,48,1))
+    # y_val = np.empty((num_val,1))
+
 
     for i in range(0,num_training):
         with Image.open(train_dir + str(i+1) + '.jpg').convert("L") as image:
@@ -113,11 +120,12 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
             im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
 
             if(i < (num_val)):
-                X_val[i] = im_arr
-                y_val[i] = labels[i]
+                X_val.append(im_arr)
+                y_val.append(labels[i])
             else:
-                X_train[i-num_val] = im_arr
-                y_train[i-num_val] = labels[i]
+                X_train.append(im_arr)
+                y_train.append(labels[i])
+
 
 
 
@@ -126,9 +134,15 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
         with Image.open(test_dir + str(i+28709+1) + '.jpg').convert("L") as image:
             im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
             im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
-            X_test[i] = im_arr
-            y_test[i] = labels[i+28708+1]
+            X_test.append(im_arr)
+            y_test.append(labels[i+28709])
 
+    X_train = np.asarray(X_train)
+    y_train = np.asarray(y_train)
+    X_test = np.asarray(X_test)
+    y_test = np.asarray(y_test)
+    X_val = np.asarray(X_val)
+    y_val = np.asarray(y_val)
 
     # Package data into a dictionary
     return {
@@ -154,7 +168,6 @@ def get_FER2013_data_tensor(num_training = 28709,num_test = 3589):
     test_dir = directory + '/Test/'
 
     labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
-    print(labels.shape)
     y_train = np.empty((num_training,1))
     y_test = np.empty((num_test,1))
 #    print(labels)
