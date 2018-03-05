@@ -5,7 +5,7 @@ from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
 
 
-regs = [0,0.1,0.2,0.5,0.8]#,0.3,0.6,0.9]#, 1e-4, 1e-6, 1e-8]
+regs = [0,0.2,0.4,0.6,0.8]#,0.3,0.6,0.9]#, 1e-4, 1e-6, 1e-8]
 data_dict = get_CIFAR10_data()
 
 losses = []
@@ -15,8 +15,8 @@ classAccs = []
 
 for regularisation in regs:
     model = FullyConnectedNet([120], dropout=0, reg=regularisation, dtype=np.float64, seed=237)
-    number_epochs = 20
-    solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay=0.98,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
+    number_epochs = 50
+    solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay=0.9,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
     accuracies.append(solver.val_acc_history)
@@ -24,18 +24,19 @@ for regularisation in regs:
     classAccs.append(results["recall"])
 #print(losses, accuracies)
 
+fig = plt.figure(figsize=(3,6))
 plt.subplot(2,2,1)
 plt.title("Training loss")
 for i, loss in enumerate(losses):
     plt.plot(loss,'-o',ms=0.1,label="Regularisation: " + str(regs[i]))
 plt.ylim(0, 5)
-plt.legend(loc='lower right')
+plt.legend(loc='upper right')
 
 
 plt.subplot(2,2,2)
 plt.title("Classification rate")
 for i, accuracy in enumerate(accuracies):
-    plt.plot(accuracy,'-o',label="Regularisation: " + str(regs[i]))
+    plt.plot(accuracy,'-o',ms=0.1,label="Regularisation: " + str(regs[i]))
 plt.plot([0.5]* len(solver.val_acc_history),'k--')
 plt.legend(loc='lower right')
 plt.xlim(0,number_epochs)
@@ -64,5 +65,6 @@ plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 
 plt.gcf().set_size_inches(15,12)
 plt.show()
+fig.savefig("learningReg.png")
 
 # learning rate, rate decay, momentum, regularisation, hidden layers, neurons per layer

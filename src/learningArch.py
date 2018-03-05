@@ -6,7 +6,7 @@ from src.utils.data_utils import get_CIFAR10_data
 
 
 archs = [[400,200], [400]]#, 1e-4, 1e-6, 1e-8]
-data_dict = get_CIFAR10_data()
+data_dict = get_FER2013_data()
 
 losses = []
 accuracies = []
@@ -14,8 +14,8 @@ f1s = []
 classAccs = []
 
 for arch in archs:
-    model = FullyConnectedNet(arch, dropout=0, reg=0.2, dtype=np.float64, seed=237)
-    number_epochs = 45
+    model = FullyConnectedNet(arch, dropout=0, reg=0.3, dtype=np.float64, seed=237)
+    number_epochs = 120
     solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay=0.98,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
