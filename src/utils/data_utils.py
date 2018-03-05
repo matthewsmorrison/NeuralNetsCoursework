@@ -6,6 +6,8 @@ import scipy.misc
 import platform
 import PIL as pillow
 from PIL import Image
+import tensorflow as tf
+
 # import tensorflow as tf
 
 
@@ -100,8 +102,8 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
 
 #    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
 
-    X_train=np.empty((num_training,48,48,1))
-    y_train = np.empty((num_training,1))
+    X_train=np.empty((num_training-num_val,48,48,1))
+    y_train = np.empty((num_training-num_val,1))
     X_test=np.empty((num_test,48,48,1))
     y_test = np.empty((num_test,1))
     X_val=np.empty((num_val,48,48,1))
@@ -127,7 +129,7 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
             im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
             im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
             X_test[i] = im_arr
-            y_test[i] = labels[i+28708+1]
+            y_test[i] = labels[i+28709]
 
 
     # Package data into a dictionary
@@ -141,62 +143,82 @@ def read_jpeg(filename_queue):
     reader = tf.WholeFileReader()
     key, value = reader.read(filename_queue)
 
-    image = tf.image.decode_jpeg(value)
+    image = tf.image.decode_raw(value, tf.uint8)
     image.set_shape([48,48,1])
     return image
 
+def combine_fer2013():
 
-def get_FER2013_data_tensor(num_training = 28709,num_test = 3589):
+    data = get_FER2013_data()
 
+    merged_train = data["X_train"]
+    merged_val = data["X_val"]
+
+    for i in range(data["y_train"]):
+        data["y_train"][i] = bytes(data["y_train"][i],'uint8')
+    for j in range(data["y_val"]):
+        data["y_val"][i] = bytes(data["y_val"][i],'uint8')
+
+    merged_train = data["y_train"] + merged_train
+    merged_val = data["y_val"] + merged_val
+
+    return merged_train, merged_val
+
+
+
+def read_fer2013(num_training = 24709,num_test = 3589,num_val = 4000):
 
     directory = 'datasets/public'
     train_dir = directory + '/Train/'
     test_dir = directory + '/Test/'
 
     labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
-    print(labels.shape)
-    y_train = np.empty((num_training,1))
-    y_test = np.empty((num_test,1))
-#    print(labels)
 
-#    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
+    #    print(labels)
 
-    jpeg_files_test = jpeg_files_train = []
-    tensor_test = tensor_train = []
+    #    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
 
-    X_train = y_train = X_test = y_test = []
+    X_train=[]
+    y_train = []
+    X_test=[]
+    y_test = []
+    X_val=[]
+    y_val = []
+
+    train_queue = tf.train.string_input_producer(tf.train.match_filenames_once(train_dir+"*.jpg"))
+    test_queue = tf.train.string_input_producer(tf.train.match_filenames_once(test_dir+"*.jpg"))
+
+    image_reader = tf.WholeFileReader()
 
     for i in range(num_training):
-        filename = (directory + train_dir + str(i+1) + ".jpeg")
-        jpeg_files_train.append(filename)
+        _,image_file = image_reader.read(train_queue)
+        image = tf.image.decode_jpeg(image_file)
+        tf.image.random_flip_left_image(image)
+        tf.image.random_brightness(image)
+        tf.image.random_contrast(image)
+        X_train.append(image.eval())
         y_train.append(labels[i])
 
+
+    for i in range(num_val):
+        _,image_file = image_reader.read(train_queue)
+        image = tf.image.decode_jpeg(image_file)
+        X_val.append(image.eval())
+        y_val.append(labels[i+num_training])
+
     for i in range(num_test):
-        filename = (directory + test_dir + str(i+1) + ".jpeg")
-        jpeg_files_test.append(filename)
-        y_test.append(labels[i+28709])
+        _,image_file = image_reader.read(test_queue)
+        image = tf.image.decode_jpeg(image_file)
+        X_test.append(image.eval())
+        y_test.append(labels[i])
 
-    filename_train_queue = tf.train.string_input_producer(jpeg_files_train)
-    filename_test_queue = tf.train.string_input_producer(jpeg_files_test)
 
-    mlist = [read_jpeg(filename_test_queue) for _ in range(len(jpeg_files_test))]
-
-    init = tf.global_variables_initializer()
-    sess_test = tf.Session()
-    sess_test.run(init)
-    test_tensor = tf.convert_to_tensor(tensor_test)
-
-#    ################################
-    mlist = []
-    mlist = [read_jpeg(filename_train_queue) for _ in range(len(jpeg_files_train))]
-
-    init = tf.global_variables_initializer()
-
-    sess_train = tf.Session()
-    sess_train.run(init)
-    train_tensor = tf.convert_to_tensor(tensor_train)
-
-    return train_tensor, test_tensor, y_train, y_test
+    # Package data into a dictionary
+    return {
+      'X_train': X_train, 'y_train': y_train,
+      'X_val': X_val, 'y_val': y_val,
+      'X_test': X_test, 'y_test': y_test,
+    }
 #image_dict = get_FER2013_data(num_training = 5000,num_test = 1000,num_val = 1000)
 #f = open('Datasets/public/image_dict_short.pkl','wb')
 #pickle.dump(image_dict,f)

@@ -20,6 +20,7 @@ from utils.data_utils import get_CIFAR10_data, get_FER2013_data
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
+from sklearn.metrics import confusion_matrix
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -30,6 +31,9 @@ def cnn_model(features, labels, mode):
     p = 0.0
     learn_rate = 0.01
     input_layer = tf.reshape(features["x"],[-1,48,48,1])
+
+
+
     input_layer = tf.cast(input_layer, tf.float32)
 
     # Regularise weights
@@ -117,9 +121,11 @@ def cnn_model(features, labels, mode):
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op = train)
 
     eval_metric_ops = {
-            "accuracy": tf.metrics.accuracy(labels=labels,predictions=predictions["classes"]),
-            "recall": tf.metrics.recall(labels=labels,predictions=predictions["classes"]),
-            "precision": tf.metrics.precision(labels=labels,predictions=predictions["classes"])
+            "accuracy": tf.metrics.accuracy(tf.cast(labels, tf.int32),predictions=predictions["classes"]),
+            "recall": tf.metrics.recall(tf.cast(labels, tf.int32),predictions=predictions["classes"]),
+            "precision": tf.metrics.precision(tf.cast(labels, tf.int32),predictions=predictions["classes"])
             }
+    # print(predictions["classes"])
+    # print(confusion_matrix(tf.cast(labels, tf.int32).eval(),predictions["classes"]))
 
     return tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops = eval_metric_ops)

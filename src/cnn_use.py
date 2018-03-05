@@ -18,7 +18,7 @@ import PIL as pillow
 from PIL import Image
 # from fcnet import FullyConnectedNet
 # from utils.solver import Solver
-from utils.data_utils import get_CIFAR10_data, get_FER2013_data
+from utils.data_utils import get_CIFAR10_data, get_FER2013_data, read_fer2013
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from cnn import cnn_model
@@ -36,19 +36,19 @@ def main(unused_argv):
 
 
 #    Create the estimator
-    classifier = tf.estimator.Estimator(model_fn = cnn_model,model_dir = "model_checkpoints_6classes4")
+    classifier = tf.estimator.Estimator(model_fn = cnn_model,model_dir = "model_checkpoints_6classes6")
 #
 
 #
 ##    Train the model
 #   Retrieve the data
 
-    data = get_FER2013_data()
+    data = read_fer2013()
 
 #   produce the input data stream
-    epochs = 20
+    epochs = 10
     training_input = tf.estimator.inputs.numpy_input_fn(
-            x={"x":data['X_train']},
+            x={"x":(data['X_train']-127.5)/127.5},
             y = data['y_train'],
             batch_size = 128,
             num_epochs = epochs,
@@ -65,14 +65,14 @@ def main(unused_argv):
 
 ##    Model evaluation
     evaluation_fn = tf.estimator.inputs.numpy_input_fn(
-            x={"x":data['X_val']},
+            x={"x":(data['X_val']-127.5)/127.5},
             y = data['y_val'],
             num_epochs = 1,
             shuffle = False
             )
 #
-#    train_spec = tf.estimator.TrainSpec(input_fn=training_input, max_steps=10000)
-#    eval_spec = tf.estimator.EvalSpec(input_fn=evaluation_fn)
+   # train_spec = tf.estimator.TrainSpec(input_fn=training_input)
+   # eval_spec = tf.estimator.EvalSpec(input_fn=evaluation_fn)
 
 #    tf.estimator.train_and_evaluate(classifier, train_spec, eval_spec)
 
