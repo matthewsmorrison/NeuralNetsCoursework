@@ -6,10 +6,11 @@ from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
 from src.utils.data_utils import get_FER2013_data
+from src.utils.data_utils import get_FER2013_data_normalisation
 
 
 dropouts = [0,0.01,0.1,0.25,0.5]
-data_dict = get_FER2013_data()
+data_dict = get_FER2013_data_normalisation()
 
 losses = []
 accuracies = []

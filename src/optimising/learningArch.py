@@ -6,10 +6,12 @@ from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
 from src.utils.data_utils import get_FER2013_data
+from src.utils.data_utils import get_FER2013_data_normalisation
 
 
-archs = [[100],[250], [400]] #[[800,400], [500,500], [200], [500], [200,200], [1000]]#, 1e-4, 1e-6, 1e-8]
-data_dict = get_FER2013_data()
+
+archs = [[400,200], [400]]#, 1e-4, 1e-6, 1e-8]
+data_dict = get_FER2013_data_normalisation()
 
 losses = []
 accuracies = []

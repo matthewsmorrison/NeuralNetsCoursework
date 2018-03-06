@@ -26,6 +26,7 @@ def test_fer_model(img_folder, model='model.pkl'):
             break
 
         # model.
+        # 
         
         i+= 1
     return preds

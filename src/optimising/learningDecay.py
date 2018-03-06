@@ -5,9 +5,10 @@ import numpy as np
 from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_FER2013_data
+from src.utils.data_utils import get_FER2013_data_normalisation
 
 rateDecays = [0.99, 0.95, 0.9, 0.3]#, 1e-4, 1e-6, 1e-8]
-data_dict = get_FER2013_data()
+data_dict = get_FER2013_data_normalisation()
 
 losses = []
 accuracies = []
@@ -16,7 +17,7 @@ f1s = []
 classAccs = []
 
 for rateDecay in rateDecays:
-    model = FullyConnectedNet([120], input_dim = 48*48*1,dropout=0, reg=0, dtype=np.float64, seed=237)
+    model = FullyConnectedNet([120], input_dim = 48*48*1, num_classes=7, dropout=0, reg=0, dtype=np.float64, seed=237)
     number_epochs = 50
     solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay=rateDecay,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()

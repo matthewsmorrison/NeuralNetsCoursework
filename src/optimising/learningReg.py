@@ -6,11 +6,12 @@ from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
 from src.utils.data_utils import get_FER2013_data
+from src.utils.data_utils import get_FER2013_data_normalisation
 
 
 
 regs = [0,0.1,0.2,0.5,0.8]
-data_dict = get_FER2013_data()
+data_dict = get_FER2013_data_normalisation()
 
 losses = []
 accuracies = []
@@ -19,7 +20,7 @@ f1s = []
 classAccs = []
 
 for regularisation in regs:
-    model = FullyConnectedNet([120], input_dim = 48*48*1, dropout=0, reg=regularisation, dtype=np.float64, seed=237)
+    model = FullyConnectedNet([120], input_dim = 48*48*1, num_classes=7, dropout=0, reg=regularisation, dtype=np.float64, seed=237)
     number_epochs = 50
     solver = Solver(model,data_dict,optim_config={'learning_rate':1e-4},lr_decay=0.95,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
