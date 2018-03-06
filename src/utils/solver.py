@@ -258,7 +258,7 @@ class Solver(object):
 
         if (self.epoch == self.num_epochs):
             conf_matrix = confusion_matrix(y_pred,y)
-            # print(conf_matrix)
+            print(conf_matrix)
             results = performanceMetrics(conf_matrix)
         else:
             results = []
