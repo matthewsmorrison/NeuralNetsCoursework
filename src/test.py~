@@ -1,0 +1,20 @@
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+
+import numpy as np
+from src.fcnet import FullyConnectedNet
+from src.utils.solver import Solver
+from src.utils.data_utils import get_CIFAR10_data
+from src.utils.data_utils import get_FER2013_data
+
+
+import pickle
+
+def test_fer_model(img_folder, model=''):
+    preds = None
+    return preds
+
+
+def save_fer_model():
+    
+    

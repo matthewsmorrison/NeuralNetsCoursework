@@ -68,7 +68,7 @@ xTicks = [str(rate) for rate in archs]
 colours = ['g', 'b', 'r', 'w', 'c', 'm', 'y', 'k', "#505050", "#DD1000"]
 for i, f1 in enumerate(f1s):
     for j, f in enumerate(f1):
-        plt.bar(1.5*i+0.1*j, f, width=0.1, color=colours[j], label=j)
+        plt.bar(1.5*i+j/6, f, width=1/6, color=colours[j], label=j)
 plt.xlabel('Learning Rate')
 plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 
