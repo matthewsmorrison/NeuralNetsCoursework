@@ -4,10 +4,11 @@ from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
 from src.utils.data_utils import get_FER2013_data
+from src.utils.data_utils import get_FER2013_data_normalisation
 
 
 archs = [[400,200], [400]]#, 1e-4, 1e-6, 1e-8]
-data_dict = get_FER2013_data()
+data_dict = get_FER2013_data_normalisation()
 
 losses = []
 accuracies = []

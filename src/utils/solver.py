@@ -360,7 +360,7 @@ def performanceMetrics(confMatrix):
     total_predictions = confMatrix.values.sum()
     total_sum = 0
     max_number = np.amax(confMatrix.index.values)
-    for row in range(0,max_number):
+    for row in range(0,max_number+1):
         total_sum = total_sum + confMatrix.iloc[row].loc[row]
 
     accuracy = (total_sum/total_predictions)*100
@@ -373,7 +373,7 @@ def performanceMetrics(confMatrix):
     precisions = []
     recalls = []
     F1s = []
-    for class_number in range(0,max_number):
+    for class_number in range(0,max_number+1):
         # print("Classification measures for class",class_number,":")
         number_correct = confMatrix.iloc[class_number].loc[class_number]
         total_number_of_class = confMatrix.iloc[class_number].sum()

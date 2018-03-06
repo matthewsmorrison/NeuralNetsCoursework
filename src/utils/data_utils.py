@@ -88,7 +88,6 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
 
 def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
 
-
     if(num_val > num_training*0.2):
         print("num_val size too large, please insert something smaller")
 
@@ -97,7 +96,6 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
     test_dir = directory + '/Test/'
 
     labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
-
 
 #    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
 
@@ -115,7 +113,6 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
     # X_val=np.empty((num_val,48,48,1))
     # y_val = np.empty((num_val,1))
 
-
     for i in range(0,num_training):
         with Image.open(train_dir + str(i+1) + '.jpg').convert("L") as image:
             im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
@@ -127,9 +124,6 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
             else:
                 X_train.append(im_arr)
                 y_train.append(labels[i])
-
-
-
 
 #    print(X_train)
     for i in range(0,num_test):
@@ -153,47 +147,16 @@ def get_FER2013_data(num_training = 28709,num_test = 3589,num_val = 4000):
       'X_test': X_test, 'y_test': y_test,
     }
 
-def read_jpeg(filename_queue):
-    reader = tf.WholeFileReader()
-    key, value = reader.read(filename_queue)
+def get_FER2013_data_normalisation(num_training = 28709,num_test = 3589,num_val = 4000):
 
-    image = tf.image.decode_raw(value, tf.uint8)
-    image.set_shape([48,48,1])
-    return image
-
-def combine_fer2013():
-
-    data = get_FER2013_data()
-
-    merged_train = data["X_train"]
-    merged_val = data["X_val"]
-
-    for i in range(data["y_train"]):
-        data["y_train"][i] = bytes(data["y_train"][i],'uint8')
-    for j in range(data["y_val"]):
-        data["y_val"][i] = bytes(data["y_val"][i],'uint8')
-
-    merged_train = data["y_train"] + merged_train
-    merged_val = data["y_val"] + merged_val
-
-    return merged_train, merged_val
-
-
-
-def read_fer2013(num_training = 24709,num_test = 3589,num_val = 4000):
+    if(num_val > num_training*0.2):
+        print("num_val size too large, please insert something smaller")
 
     directory = 'datasets/public'
     train_dir = directory + '/Train/'
     test_dir = directory + '/Test/'
 
     labels = np.loadtxt(directory + '/labels_public.txt',skiprows=1,delimiter=',',usecols=1,dtype='int')
-    y_train = np.empty((num_training,1))
-    y_test = np.empty((num_test,1))
-#    print(labels)
-
-    #    print(labels)
-
-    #    data = dict.fromkeys(['X_train','y_train','X_test','y_test','X_val','y_val'])
 
     X_train=[]
     y_train = []
@@ -202,33 +165,35 @@ def read_fer2013(num_training = 24709,num_test = 3589,num_val = 4000):
     X_val=[]
     y_val = []
 
-    train_queue = tf.train.string_input_producer(tf.train.match_filenames_once(train_dir+"*.jpg"))
-    test_queue = tf.train.string_input_producer(tf.train.match_filenames_once(test_dir+"*.jpg"))
+    for i in range(0,num_training):
+        with Image.open(train_dir + str(i+1) + '.jpg').convert("L") as image:
+            im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+            im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
 
-    image_reader = tf.WholeFileReader()
+            if(i < (num_val)):
+                X_val.append(im_arr)
+                y_val.append(labels[i])
+            else:
+                X_train.append(im_arr)
+                y_train.append(labels[i])
 
-    for i in range(num_training):
-        _,image_file = image_reader.read(train_queue)
-        image = tf.image.decode_jpeg(image_file)
-        tf.image.random_flip_left_image(image)
-        tf.image.random_brightness(image)
-        tf.image.random_contrast(image)
-        X_train.append(image.eval())
-        y_train.append(labels[i])
+#    print(X_train)
+    for i in range(0,num_test):
+        with Image.open(test_dir + str(i+28709+1) + '.jpg').convert("L") as image:
+            im_arr = np.fromstring(image.tobytes(), dtype=np.uint8)
+            im_arr = im_arr.reshape((image.size[1], image.size[0], 1))
+            X_test.append(im_arr)
+            y_test.append(labels[i+28709])
 
+    mean_image = np.mean(X_train, axis=0, dtype=int)
+    X_train = np.asarray(X_train) - mean_image
+    y_train = np.asarray(y_train)
+    X_test = np.asarray(X_test) - mean_image
+    y_test = np.asarray(y_test)
+    X_val = np.asarray(X_val) - mean_image
+    y_val = np.asarray(y_val)
 
-    for i in range(num_val):
-        _,image_file = image_reader.read(train_queue)
-        image = tf.image.decode_jpeg(image_file)
-        X_val.append(image.eval())
-        y_val.append(labels[i+num_training])
-
-    for i in range(num_test):
-        _,image_file = image_reader.read(test_queue)
-        image = tf.image.decode_jpeg(image_file)
-        X_test.append(image.eval())
-        y_test.append(labels[i])
-
+    # print(X_train)
 
     # Package data into a dictionary
     return {
@@ -236,15 +201,3 @@ def read_fer2013(num_training = 24709,num_test = 3589,num_val = 4000):
       'X_val': X_val, 'y_val': y_val,
       'X_test': X_test, 'y_test': y_test,
     }
-#image_dict = get_FER2013_data(num_training = 5000,num_test = 1000,num_val = 1000)
-#f = open('Datasets/public/image_dict_short.pkl','wb')
-#pickle.dump(image_dict,f)
-#f.close()
-
-
-#data = get_FER2013_data(num_training = 100,num_test = 100,num_val = 20)
-#for key, values in data.items():
-#    print(key,values)
-
-#train_tensor, test_tensor, y_train, y_test =   get_FER2013_data_tensor(num_training = 5000,num_test = 1000)
-#print(y_train)
