@@ -24,7 +24,7 @@ classAccs = []
 for learningRate in learningRates:
     # print(learningRate)
     model = FullyConnectedNet([120],input_dim = 48*48*1, dropout=0, reg=0, dtype=np.float64, seed=237)
-    number_epochs = 3
+    number_epochs = 2
     solver = Solver(model,data_dict,optim_config={'learning_rate':learningRate},lr_decay=1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
@@ -41,7 +41,7 @@ fig = plt.figure(figsize=(3,6))
 plt.subplot(2,2,1)
 plt.title("Training Loss")
 for i, loss in enumerate(losses):
-    plt.plot(loss,'-o',ms=0.1,label="learning rate: " + str(learningRates[i]))
+    plt.plot(loss,'-o',ms=0.1,label="learning rate: " + str(archs[i]))
 plt.ylim(0, 6)
 plt.legend(prop=fontP,loc='upper right')
 
@@ -49,7 +49,7 @@ plt.legend(prop=fontP,loc='upper right')
 plt.subplot(2,2,2)
 plt.title("Classification Rate (Validation Set)")
 for i, accuracy in enumerate(accuracies):
-    plt.plot(accuracy,'-o',ms=1, label="learning rate: " + str(learningRates[i]))
+    plt.plot(accuracy,'-o',ms=1, label="learning rate: " + str(archs[i]))
 plt.plot([0.5]* len(solver.val_acc_history),'k--')
 plt.legend(prop=fontP,loc='upper left')
 plt.xlim(0,number_epochs)
@@ -57,14 +57,14 @@ plt.xlim(0,number_epochs)
 plt.subplot(2,2,3)
 plt.title("Classification Rate (Training Set)")
 for i, accuracy in enumerate(trainAccs):
-    plt.plot(accuracy,'-o',ms=1,label="learning rate: " + str(learningRates[i]))
+    plt.plot(accuracy,'-o',ms=1,label="learning rate: " + str(archs[i]))
 plt.plot([0.5]* len(solver.train_acc_history),'k--')
 plt.legend(prop=fontP,loc='upper left')
 plt.xlim(0,number_epochs)
 
 plt.subplot(2,2,4)
 plt.title("F1 Per Class (Validation Set)")
-xTicks = [str(rate) for rate in learningRates]
+xTicks = [str(rate) for rate in archs]
 colours = ['g', 'b', 'r', 'w', 'c', 'm', 'y', 'k', "#505050", "#DD1000"]
 for i, f1 in enumerate(f1s):
     for j, f in enumerate(f1):
