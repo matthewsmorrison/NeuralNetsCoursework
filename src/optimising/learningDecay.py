@@ -82,4 +82,4 @@ plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 plt.gcf().set_size_inches(15,12)
 
 # plt.show()
-fig.savefig("learningDecay.png")
+fig.savefig("src/optimising/outputs/learningDecay.png")

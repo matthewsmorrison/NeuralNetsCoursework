@@ -24,7 +24,7 @@ classAccs = []
 for learningRate in learningRates:
     # print(learningRate)
     model = FullyConnectedNet([120],input_dim = 48*48*1, dropout=0, reg=0, dtype=np.float64, seed=237)
-    number_epochs = 50
+    number_epochs = 2
     solver = Solver(model,data_dict,optim_config={'learning_rate':learningRate},lr_decay=1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
@@ -89,4 +89,4 @@ plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 plt.gcf().set_size_inches(15,12)
 
 # plt.show()
-fig.savefig("learning.png")
+fig.savefig("src/optimising/outputs/learning.png")

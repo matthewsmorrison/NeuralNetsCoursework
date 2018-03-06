@@ -258,7 +258,9 @@ class Solver(object):
 
         if (self.epoch == self.num_epochs):
             conf_matrix = confusion_matrix(y_pred,y)
+            print("\n")
             print(conf_matrix)
+            print("\n")
             results = performanceMetrics(conf_matrix)
         else:
             results = []
@@ -344,12 +346,11 @@ class Solver(object):
 
 def confusion_matrix(predicted,actual):
 
-    conf_matrix = pd.DataFrame(np.zeros((10,10),int))
+    max_class = np.amax(predicted)
+    conf_matrix = pd.DataFrame(np.zeros((max_class+1,max_class+1),int))
     data_num = actual.shape[0]
-
     for i in range(0,data_num):
         conf_matrix[actual[i]][predicted[i]] += 1
-
     return conf_matrix
 
 # Produce performance metrixs from confusion matrix
@@ -358,7 +359,8 @@ def performanceMetrics(confMatrix):
     # Number one: total classification rate.
     total_predictions = confMatrix.values.sum()
     total_sum = 0
-    for row in range(0,10):
+    max_number = np.amax(confMatrix.index.values)
+    for row in range(0,max_number):
         total_sum = total_sum + confMatrix.iloc[row].loc[row]
 
     accuracy = (total_sum/total_predictions)*100
@@ -371,7 +373,7 @@ def performanceMetrics(confMatrix):
     precisions = []
     recalls = []
     F1s = []
-    for class_number in range(0,10):
+    for class_number in range(0,max_number):
         # print("Classification measures for class",class_number,":")
         number_correct = confMatrix.iloc[class_number].loc[class_number]
         total_number_of_class = confMatrix.iloc[class_number].sum()
@@ -389,7 +391,7 @@ def performanceMetrics(confMatrix):
         # print("Recall:","{0:.0f}%".format(recall*100))
         # print("F1:","{0:.0f}%".format(F1*100),"\n")
 
-    unweighted_average_recall = unweighted_average_recall / 10
+    unweighted_average_recall = unweighted_average_recall / max_number
     # print("Unweighted Average Recall:","{0:.0f}%".format(unweighted_average_recall*100),"\n")
     results = {"accuracy":accuracy, "precision":precisions, "recall":recalls,
      "F1":F1s, "uneweighted_average_recall":unweighted_average_recall}
