@@ -18,3 +18,12 @@ site for download. Optionally: You **can** also choose this advanced assignment,
 3. Mixed of Master's Computing and non Master's Computing students: You
  **must** complete the advanced assignment (`manuals/assignment2_advanced.md`,
  pdf format is also available).
+
+=====================================
+
+Tests to run:
+
+1. python3 -m test.test_layers TestLinearLayer
+2. python3 -m test.test_layers TestReLULayer
+3. python3 -m test.test_layers TestDropoutLayer
+4. python3 -m test.test_classifiers

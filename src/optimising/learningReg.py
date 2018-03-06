@@ -9,7 +9,7 @@ from src.utils.data_utils import get_FER2013_data
 
 
 
-regs = [0,0.1,0.2,0.5,0.8]#,0.3,0.6,0.9]#, 1e-4, 1e-6, 1e-8]
+regs = [0,0.1,0.2,0.5,0.8]
 data_dict = get_FER2013_data()
 
 losses = []
@@ -86,4 +86,4 @@ plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 plt.gcf().set_size_inches(15,12)
 
 # plt.show()
-fig.savefig("learningReg.png")
+fig.savefig("src/optimising/outputs/learningReg.png")

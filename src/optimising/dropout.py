@@ -70,4 +70,4 @@ plt.xlabel('Dropout')
 plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 
 plt.gcf().set_size_inches(15,12)
-fig.savefig("dropout.png")
+fig.savefig("src/optimising/outputs/dropout.png")
