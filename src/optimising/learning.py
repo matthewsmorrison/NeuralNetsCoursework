@@ -9,10 +9,10 @@ from src.utils.data_utils import get_FER2013_data
 
 #import sys
 #import traceback
-#sys.stdout = traceback.print_stack 
+#sys.stdout = traceback.print_stack
 #print = None
 
-learningRates = [0.00005]#, 1e-4, 1e-5, 1e-6, 1e-8]
+learningRates = [0.001, 1e-4, 1e-5, 1e-6, 1e-8]
 data_dict = get_FER2013_data()
 
 losses = []
@@ -24,7 +24,7 @@ classAccs = []
 for learningRate in learningRates:
     # print(learningRate)
     model = FullyConnectedNet([120],input_dim = 48*48*1, dropout=0, reg=0, dtype=np.float64, seed=237)
-    number_epochs = 3
+    number_epochs = 50
     solver = Solver(model,data_dict,optim_config={'learning_rate':learningRate},lr_decay=1,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()
     losses.append(solver.loss_history)
@@ -86,7 +86,7 @@ plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 #plt.xlabel('Learning Rate')
 #plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 
-#plt.gcf().set_size_inches(15,12)
+plt.gcf().set_size_inches(15,12)
 
-plt.show()
+# plt.show()
 fig.savefig("learning.png")
