@@ -7,7 +7,7 @@ from src.utils.solver import Solver
 from src.utils.data_utils import get_FER2013_data
 from src.utils.data_utils import get_FER2013_data_normalisation
 
-learningRates = [1e-4]#[0.001, 1e-4, 1e-5, 1e-6, 1e-8]
+learningRates = [1e-4, 1e-5, 1e-6, 1e-8]
 data_dict = get_FER2013_data_normalisation()
 
 losses = []
@@ -68,20 +68,6 @@ for i, f1 in enumerate(f1s):
         plt.bar(1.5*i+(j/7), f, width=(1/7), color=colours[j], label=j)
 plt.xlabel('Learning Rate')
 plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
-
-
-#plt.plot(solver.loss_history,'-o',label='train')
-
-
-#plt.subplot(2,2,4)
-#plt.title("Classification Rate Per Class (Validation Set)")
-#xTicks = [str(rate) for rate in learningRates]
-#colours = ['g', 'b', 'r', 'w', 'c', 'm', 'y', 'k', "#505050", "#DD1000"]
-#for i, classAcc in enumerate(classAccs):
-#    for j, acc in enumerate(classAcc):
-#        plt.bar(1.5*i+0.1*j, acc, width=0.1, color=colours[j], label=j)
-#plt.xlabel('Learning Rate')
-#plt.xticks([1.5*i+0.5 for i in range(len(f1s))], xTicks)
 
 plt.gcf().set_size_inches(15,12)
 

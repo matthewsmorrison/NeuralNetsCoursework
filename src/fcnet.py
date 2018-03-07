@@ -156,9 +156,9 @@ class FullyConnectedNet(object):
             relu_cache["R"+str(i+1)] = curr_act
             curr_act = relu_forward(curr_act)
 #            print("curr_act: ",curr_act)
-            if self.use_dropout:
+            if self.use_dropout and y is not None:
                 dropout_cache["D"+str(i+1)] = curr_act
-                curr_act, mask = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"],seed=self.dropout_params["seed"])
+                curr_act, mask = dropout_forward(curr_act,p=self.dropout_params["p"],train=self.dropout_params["Train"])#,seed=self.dropout_params["seed"])
                 mask_cache["R"+str(i+1)] = mask
             activations.append([curr_act])
 
