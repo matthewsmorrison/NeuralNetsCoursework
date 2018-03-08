@@ -9,7 +9,7 @@ from src.utils.data_utils import get_FER2013_data
 from src.utils.data_utils import get_FER2013_data_normalisation
 
 
-dropouts = [0,0.01,0.1,0.25,0.5]
+dropouts = [0.05]
 data_dict = get_FER2013_data_normalisation()
 
 losses = []
@@ -18,7 +18,7 @@ f1s = []
 classAccs = []
 
 for eachDropout in dropouts:
-    model = FullyConnectedNet([120], dropout=eachDropout, reg=0, dtype=np.float64, seed=237)
+    model = FullyConnectedNet([120], input_dim = 48*48*1, num_classes=7, dropout=eachDropout, reg=0, dtype=np.float64, seed=237)
     number_epochs = 50
     solver = Solver(model,data_dict,optim_config={'learning_rate':0.0001},lr_decay=0.9,num_epochs=number_epochs,batch_size=200,print_every=5000,num_train_samples=40000)
     results = solver.train()

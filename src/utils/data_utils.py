@@ -197,7 +197,8 @@ def get_FER2013_data_normalisation(num_training = 28709,num_test = 3589,num_val 
 
     # Package data into a dictionary
     return {
-      'X_train': X_train, 'y_train': y_train,
-      'X_val': X_val, 'y_val': y_val,
-      'X_test': X_test, 'y_test': y_test,
+        'X_train': X_train, 'y_train': y_train,
+        'X_val': X_val, 'y_val': y_val,
+        'X_test': X_test, 'y_test': y_test,
+        'mean_image': mean_image
     }
