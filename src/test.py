@@ -39,10 +39,4 @@ def test_fer_model(img_folder, model='model.pkl'):
     return y_pred
 
 
-ypred = test_fer_model("/home/vincent/Documents/imperial/machine learning/Coursework/NeuralNetsCoursework/datasets/public/Test/")
-y = get_FER2013_data_normalisation()["y_test"]
-confMatrix = confusion_matrix(ypred, y)
-metrics = performanceMetrics(confMatrix)
-print(confMatrix)
-print(metrics)
 
